@@ -1,0 +1,15 @@
+{
+  "categories": [
+    "api-reference",
+    "guides"
+  ],
+  "subcategories": [
+    "customization"
+  ],
+  "items": [
+    "advanced-usage",
+    "getting-started",
+    "quick-reference",
+    "themes"
+  ]
+}
