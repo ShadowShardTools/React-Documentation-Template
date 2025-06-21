@@ -1,0 +1,18 @@
+{
+    "id": "advanced-usage",
+    "title": "Advanced Usage",
+    "category": "guides",
+    "content": [
+        {
+            "type": "title-h2",
+            "content": "Advanced Configuration"
+        },
+        {
+            "type": "description",
+            "content": "Learn advanced techniques to enhance your project."
+        }
+    ],
+    "tags": [
+        "advanced"
+    ]
+}

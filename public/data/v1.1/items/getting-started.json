@@ -1,0 +1,51 @@
+{
+  "id": "getting-started",
+  "title": "Getting Started",
+  "content": [
+    {
+      "type": "title-h2",
+      "content": "Welcome to Our Documentation"
+    },
+    {
+      "type": "description",
+      "content": "This documentation will help you get started with our product quickly and efficiently. Follow the steps below to begin your journey."
+    },
+    {
+      "type": "title-h3",
+      "content": "Installation"
+    },
+    {
+      "type": "code",
+      "content": "npm install our-package\n# or\nyarn add our-package",
+      "language": "bash"
+    },
+    {
+      "type": "description",
+      "content": "After installation, you can import the package in your project:"
+    },
+    {
+      "type": "code",
+      "content": "import { Component } from \"our-package\";\n\nconst app = new Component();",
+      "language": "javascript"
+    },
+    {
+      "type": "title-h3",
+      "content": "C# Integration Example"
+    },
+    {
+      "type": "description",
+      "content": "If you're using our API from a .NET application, here's how you can get started:"
+    },
+    {
+      "type": "code",
+      "content": "using OurPackage;\n\nclass Program\n{\n    static void Main()\n    {\n        var component = new Component();\n        component.Run();\n    }\n}",
+      "language": "csharp"
+    },
+    { "type": "youtube", "videoId": "1bSEHTbrisQ" }
+  ],
+  "tags": [
+    "introduction",
+    "setup",
+    "csharp"
+  ]
+}

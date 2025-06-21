@@ -1,1 +1,29 @@
 @import "tailwindcss";
+@import '@splidejs/react-splide/css';
+
+@media print {
+  .break-after-page {
+    page-break-after: always;
+  }
+
+  .print-all {
+    background: white;
+    color: black;
+    padding: 0;
+  }
+
+  header, aside, nav, .print-hidden {
+    display: none !important;
+  }
+
+  img {
+    page-break-inside: avoid;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+

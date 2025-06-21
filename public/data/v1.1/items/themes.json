@@ -1,0 +1,20 @@
+{
+    "id": "themes",
+    "title": "Using Themes",
+    "category": "api-reference",
+    "subcategory": "customization",
+    "content": [
+        {
+            "type": "title-h2",
+            "content": "Theming Options"
+        },
+        {
+            "type": "description",
+            "content": "Learn how to apply custom themes."
+        }
+    ],
+    "tags": [
+        "customization",
+        "themes"
+    ]
+}
