@@ -1,20 +1,18 @@
 import { Search } from 'lucide-react';
 
 const SearchBar: React.FC<{
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
-}> = ({ searchTerm, onSearchChange }) => {
+  onClick: () => void;
+}> = ({ onClick }) => {
   return (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-      <input
-        type="text"
-        placeholder="Search documentation..."
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-    </div>
+    <button
+      onClick={onClick}
+      className="relative flex w-full items-center border border-gray-300 rounded-md px-3 py-2 w-64 text-left text-sm text-gray-500 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <Search className="w-4 h-4 mr-2 text-gray-400" />
+      <span className="flex-1 text-gray-500">Search...</span>
+      <kbd className="ml-4 px-1.5 py-0.5 text-xs font-semibold text-gray-500 border border-gray-300 rounded">Ctrl</kbd>
+      <kbd className="ml-1 px-1.5 py-0.5 text-xs font-semibold text-gray-500 border border-gray-300 rounded">K</kbd>
+    </button>
   );
 };
 

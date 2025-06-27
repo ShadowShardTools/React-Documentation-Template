@@ -17,7 +17,8 @@ export class DocumentationLoader {
   }
 
   static async loadVersions(): Promise<Version[]> {
-    return this.fetchJson<Version[]>('/data/versions.json');
+    const root = import.meta.env.BASE_URL.replace(/\/$/, '');
+    return this.fetchJson<Version[]>(`${root}/data/versions.json`);
   }
 
   static async loadVersionData(version: string): Promise<{
@@ -25,8 +26,10 @@ export class DocumentationLoader {
     categories: Record<string, Category>;
     subcategories: Record<string, Subcategory>;
   }> {
-    const basePath = `/data/${version}`;
+    const root = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const basePath = `${root}/data/${version}`;
     const indexPath = `${basePath}/index.json`;
+
 
     let index: IndexJson;
     try {

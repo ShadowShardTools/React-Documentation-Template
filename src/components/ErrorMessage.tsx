@@ -1,4 +1,4 @@
-import { AlertCircle  } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 const ErrorMessage: React.FC<{ message: string; onRetry?: () => void }> = ({ message, onRetry }) => (
   <div className="flex items-center justify-center p-8">

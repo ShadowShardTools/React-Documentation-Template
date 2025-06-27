@@ -1,18 +1,16 @@
 // src/App.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, HashRouter } from 'react-router-dom';
 import MainPage from './pages/MainPage';
-import PrintPage from './pages/PrintPage';
 
 function App() {
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen max-w-7xl mx-auto px-6 lg:px-8">
+    <HashRouter>
+      <div className="flex flex-col min-h-screen max-w-7xl mx-auto px-0 lg:px-8 md:px-6">
         <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/print/:version" element={<PrintPage />} />
+          <Route path="/:docId?" element={<MainPage />} />
         </Routes>
       </div>
-    </Router>
+    </HashRouter>
   );
 }
 

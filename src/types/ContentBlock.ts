@@ -5,6 +5,8 @@ export interface ContentBlock {
     | 'title-h3'
     | 'description'
     | 'code'
+    | 'math'
+    | 'graph'
     | 'list'
     | 'table'
     | 'image'
@@ -16,7 +18,11 @@ export interface ContentBlock {
     | 'carousel';
 
   content: string;
+  
+  scriptName?: string;
   language?: string;
+
+  graphExpressions?: string[];
 
   // List
   items?: string[];

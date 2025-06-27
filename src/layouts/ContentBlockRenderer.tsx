@@ -1,18 +1,43 @@
-import 'prismjs';
-import 'prismjs/themes/prism-okaidia.css';
-
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-csharp';
-import 'prismjs/components/prism-json';
-
 import Prism from 'prismjs';
+import 'prismjs/themes/prism-okaidia.css';
+import '../generated/prism-languages.generated';
+
+import katex from 'katex';
+
 import type { ContentBlock } from '../types/ContentBlock';
 import CompareImage from 'react-compare-image';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
+import { useEffect, useRef, useState } from 'react';
+import { Copy } from 'lucide-react';
+import GraphBlock from '../components/GraphBlock';
 
-const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = ({ block, index }) => {
+const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = ({ block, index }) => {
+  const codeRef = useRef<HTMLElement>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const highlight = async () => {
+      if (!codeRef.current) return;
+      const lang = block.language || 'text';
+      try {
+        if (!Prism.languages[lang]) {
+          await import(/* @vite-ignore */ `prismjs/components/prism-${lang}.js`);
+        }
+      } catch {
+        console.warn(`Language '${lang}' not available in Prism, falling back to plain text.`);
+      }
+
+      codeRef.current.innerHTML = Prism.highlight(
+        block.content,
+        Prism.languages[lang] || Prism.languages.plaintext,
+        lang
+      );
+    };
+
+    highlight();
+  }, [block.language, block.content]);
+
+
   switch (block.type) {
     case 'title-h1':
       return (
@@ -44,15 +69,25 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = (
 
     case 'code':
       return (
-        <div key={index} className="mb-6 overflow-hidden">
-          <pre className="language-${block.language || 'text'} bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
-            <code
-              className={`language-${block.language || 'text'}`}
-              ref={el => {
-                if (el) {
-                  el.innerHTML = Prism.highlight(block.content, Prism.languages[block.language || 'text'] || Prism.languages.plaintext, block.language || 'text');
-                }
+        <div key={index} className="relative mb-6 overflow-hidden rounded-md">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-gray-800 text-white text-xs font-mono border-b">
+            <span className="text-gray-300">{block.scriptName}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(block.content);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
               }}
+              className="flex items-center gap-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <pre className="language-${block.language || 'text'} !m-0 !rounded-none !p-4 !overflow-x-auto !text-sm !w-full">
+            <code
+              ref={codeRef}
+              className={`language-${block.language || 'text'} break-words whitespace-pre`}
             />
           </pre>
           {block.language && (
@@ -63,6 +98,24 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = (
         </div>
       );
 
+    case 'math':
+      return (
+        <div key={index} className="mb-6 text-center">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: katex.renderToString(block.content, { throwOnError: false })
+            }}
+            className="text-gray-800 text-lg"
+          />
+        </div>
+      );
+
+    case 'graph':
+      return (
+        <div key={index} className="mb-6">
+          <GraphBlock expressions={block.graphExpressions || []} />
+        </div>
+      );
 
     case 'list':
       return (
@@ -81,7 +134,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = (
               <thead className="bg-gray-50">
                 <tr>
                   {block.headers.map((header, headerIndex) => (
-                    <th key={headerIndex} className="px-4 py-2 text-left font-medium text-gray-700 border-b border-gray-300">
+                    <th key={headerIndex} className="px-4 py-2 text-left font-medium text-gray-700 border-b border-gray-300 border-r last:border-r-0">
                       {header}
                     </th>
                   ))}
@@ -92,7 +145,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = (
               {block.rows?.map((row, rowIndex) => (
                 <tr key={rowIndex} className="border-b border-gray-200 last:border-b-0">
                   {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-2 text-gray-600">
+                    <td key={cellIndex} className="px-4 py-2 text-gray-600 border-r border-gray-300 last:border-r-0">
                       {cell}
                     </td>
                   ))}
@@ -168,14 +221,16 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number }> = (
 
     case 'youtube':
       return (
-        <div key={index} className="mb-6 aspect-video">
-          <iframe
-            src={`https://www.youtube.com/embed/${block.videoId}`}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="w-full h-full rounded-lg border"
-          ></iframe>
+        <div key={index} className="mb-6">
+          <div className="aspect-video">
+            <iframe
+              src={`https://www.youtube.com/embed/${block.videoId}`}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full rounded-lg border"
+            ></iframe>
+          </div>
         </div>
       );
 

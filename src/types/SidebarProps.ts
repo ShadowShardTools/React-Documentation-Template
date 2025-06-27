@@ -8,4 +8,5 @@ export interface SidebarProps {
   subcategories: Record<string, Subcategory>;
   onSelect: (item: DocItem) => void;
   selectedItem?: DocItem | null;
+  initiallyVisible?: boolean;
 }

@@ -1,6 +1,6 @@
 //src/components/Header/Header.tsx
 import { useState } from 'react';
-import { Menu, Printer, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import MobileMenu from './MobileMenu';
 import GithubButtonLink from '../../components/GithubButtonLink';
@@ -13,9 +13,8 @@ const Header: React.FC<{
   currentVersion: string;
   onVersionChange: (version: string) => void;
   loading: boolean;
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
-}> = ({ versions, currentVersion, onVersionChange, loading, searchTerm, onSearchChange }) => {
+  onSearchOpen: () => void;
+}> = ({ versions, currentVersion, onVersionChange, loading, onSearchOpen }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(prev => !prev);
@@ -27,26 +26,13 @@ const Header: React.FC<{
         <div className="flex items-center space-x-4">
           {/* Desktop only */}
           <div className="hidden md:flex items-center space-x-4">
-            <SearchBar
-              searchTerm={searchTerm}
-              onSearchChange={onSearchChange}
-            />
+            <SearchBar onClick={onSearchOpen} />
             <VersionSelector
               versions={versions}
               currentVersion={currentVersion}
               onVersionChange={onVersionChange}
               loading={loading}
             />
-            <a
-              href={`/print/${currentVersion}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700"
-              title="Print all documentation"
-            >
-              <Printer className="w-5 h-5" />
-            </a>
-
             <GithubButtonLink />
           </div>
 
@@ -67,8 +53,7 @@ const Header: React.FC<{
           currentVersion={currentVersion}
           onVersionChange={onVersionChange}
           loading={loading}
-          searchTerm={searchTerm}
-          onSearchChange={onSearchChange}
+          onSearchOpen={onSearchOpen}
         />
       )}
 

@@ -26,10 +26,10 @@ const VersionSelector: React.FC<{
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full justify-between items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+        className="flex grow flex-row w-full justify-between items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
         disabled={versions.length === 0}
       >
-        <span className="font-medium">{current?.label || 'Select Version'}</span>
+        <span className="font-medium text-nowrap">{current?.label || 'Select Version'}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       

@@ -1,4 +1,3 @@
-import { Printer } from 'lucide-react';
 import SearchBar from '../../components/SearchBar';
 import VersionSelector from '../../components/VersionSelector';
 import type { Version } from '../../types/Version';
@@ -8,8 +7,7 @@ interface MobileMenuProps {
   currentVersion: string;
   onVersionChange: (version: string) => void;
   loading: boolean;
-  searchTerm: string;
-  onSearchChange: (term: string) => void;
+  onSearchOpen: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -17,11 +15,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   currentVersion,
   onVersionChange,
   loading,
-  searchTerm,
-  onSearchChange,
+  onSearchOpen
 }) => (
   <div className="absolute top-16 left-0 w-full bg-white border-t border-gray-200 z-40 p-4 md:hidden shadow-md space-y-4">
-    <SearchBar searchTerm={searchTerm} onSearchChange={onSearchChange} />
+    <SearchBar onClick={onSearchOpen} />
     <VersionSelector
       versions={versions}
       currentVersion={currentVersion}
@@ -29,15 +26,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       loading={loading}
     />
 
-    <a
-      href={`/print/${currentVersion}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex gap-2 bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700"
-      title="Print all documentation"
-    >
-      <Printer className="w-5 h-5" />Print
-    </a>
     <a
       href="https://github.com/ShadowShardTools/React-Documentation-Template"
       target="_blank"
