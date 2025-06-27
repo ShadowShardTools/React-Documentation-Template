@@ -1,6 +1,8 @@
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-okaidia.css';
 import '../generated/prism-languages.generated';
+import { Link as LinkIcon } from 'lucide-react';
+
 
 import katex from 'katex';
 
@@ -10,10 +12,54 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { useEffect, useRef, useState } from 'react';
 import { Copy } from 'lucide-react';
 import GraphBlock from '../components/GraphBlock';
+import { useLocation } from 'react-router-dom';
+
+const slugify = (text: string) =>
+  text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
+
+const renderHeading = (
+  index: number,
+  level: 'h1' | 'h2' | 'h3',
+  content: string,
+  className: string,
+  currentPath: string
+) => {
+  const id = slugify(content);
+  const Tag = level;
+
+  return (
+    <Tag
+      key={index}
+      id={id}
+      className={`${className} scroll-mt-20 group relative`}
+      data-anchor-id={id}
+    >
+      {content}
+      <a
+        href={`#${currentPath}#${id}`}
+        className="ml-2 inline-block text-gray-400 hover:text-blue-500"
+        aria-label="Anchor link"
+        onClick={(e) => {
+          e.preventDefault();
+          // Update URL without triggering navigation
+          const newUrl = `#${currentPath}#${id}`;
+          window.history.replaceState(null, '', newUrl);
+          // Scroll to element
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+      >
+        <LinkIcon className="w-4 h-4" />
+      </a>
+    </Tag>
+  );
+};
 
 const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = ({ block, index }) => {
   const codeRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
+  const location = useLocation();
+  
+  const currentPath = location.pathname;
 
   useEffect(() => {
     const highlight = async () => {
@@ -37,28 +83,15 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
     highlight();
   }, [block.language, block.content]);
 
-
   switch (block.type) {
     case 'title-h1':
-      return (
-        <h1 key={index} className="text-4xl font-bold text-gray-900 mb-6 mt-8 first:mt-0">
-          {block.content}
-        </h1>
-      );
+      return renderHeading(index, 'h1', block.content, 'text-4xl font-bold text-gray-900 mb-6 mt-8 first:mt-0', currentPath);
 
     case 'title-h2':
-      return (
-        <h2 key={index} className="text-2xl font-semibold text-gray-800 mb-4 mt-8 first:mt-0">
-          {block.content}
-        </h2>
-      );
+      return renderHeading(index, 'h2', block.content, 'text-2xl font-semibold text-gray-800 mb-4 mt-8 first:mt-0', currentPath);
 
     case 'title-h3':
-      return (
-        <h3 key={index} className="text-xl font-medium text-gray-700 mb-3 mt-6 first:mt-0">
-          {block.content}
-        </h3>
-      );
+      return renderHeading(index, 'h3', block.content, 'text-xl font-medium text-gray-700 mb-3 mt-6 first:mt-0', currentPath);
 
     case 'description':
       return (
@@ -84,7 +117,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
               {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
-          <pre className="language-${block.language || 'text'} !m-0 !rounded-none !p-4 !overflow-x-auto !text-sm !w-full">
+          <pre className={`language-${block.language || 'text'} !m-0 !rounded-none !p-4 !overflow-x-auto !text-sm !w-full`}>
             <code
               ref={codeRef}
               className={`language-${block.language || 'text'} break-words whitespace-pre`}

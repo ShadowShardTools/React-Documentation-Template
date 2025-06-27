@@ -40,6 +40,14 @@ const MainPage: React.FC = () => {
     return () => window.removeEventListener("keydown", listener);
   }, []);
 
+  // Helper function to navigate with anchor
+  const navigateToItem = (item: DocItem, anchor?: string) => {
+    const path = `/${item.id}`;
+    const fullPath = anchor ? `${path}#${anchor}` : path;
+    navigate(fullPath);
+    setSelectedItem(item);
+  };
+
   // Filter logic (title priority)
   const filteredItems = items.filter(item => {
     const t = searchTerm.toLowerCase();
@@ -75,10 +83,7 @@ const MainPage: React.FC = () => {
           items={items}
           categories={categories}
           subcategories={subcategories}
-          onSelect={(item) => {
-            navigate(`/${item.id}`);
-            setSelectedItem(item);
-          }}
+          onSelect={(item) => navigateToItem(item)}
           selectedItem={selectedItem}
         />
 
@@ -109,10 +114,7 @@ const MainPage: React.FC = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         results={filteredItems}
-        onSelect={(item) => {
-          navigate(`/${item.id}`);
-          setSelectedItem(item);
-        }}
+        onSelect={(item) => navigateToItem(item)}
       />
     </div>
   );
