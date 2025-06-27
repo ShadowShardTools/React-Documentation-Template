@@ -38,10 +38,34 @@
     },
     {
       "type": "code",
+      "scriptName": "Program.cs",
       "content": "using OurPackage;\n\nclass Program\n{\n    static void Main()\n    {\n        var component = new Component();\n        component.Run();\n    }\n}",
       "language": "csharp"
     },
-    { "type": "youtube", "videoId": "1bSEHTbrisQ" }
+    {
+      "type": "title-h2",
+      "content": "Graphing y = sin(x)"
+    },
+    {
+      "type": "description",
+      "content": "This is a live graph powered by Desmos. You can modify the equation below to try different formulas."
+    },
+    {
+      "type": "math",
+      "content": "\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}"
+    },
+    {
+      "type": "graph",
+      "graphExpressions": [
+        "y=\\sin(x)",
+        "y=\\cos(x)",
+        "y=\\sin(x)+\\cos(x)"
+      ]
+    },
+    {
+      "type": "youtube",
+      "videoId": "1bSEHTbrisQ"
+    }
   ],
   "tags": [
     "introduction",
