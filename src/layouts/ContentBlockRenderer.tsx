@@ -1,18 +1,12 @@
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-okaidia.css';
 import '../generated/prism-languages.generated';
-import { Link as LinkIcon } from 'lucide-react';
+import { Link as LinkIcon, Copy } from 'lucide-react';
 
-
-import katex from 'katex';
-
-import type { ContentBlock } from '../types/ContentBlock';
-import CompareImage from 'react-compare-image';
-import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { useEffect, useRef, useState } from 'react';
-import { Copy } from 'lucide-react';
-import GraphBlock from '../components/GraphBlock';
 import { useLocation } from 'react-router-dom';
+import type { ContentBlockRendererProps } from '../types/props/ContentBlockRendererProps';
+import DynamicKatex from '../components/DynamicKatex';
 
 const slugify = (text: string) =>
   text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
@@ -41,10 +35,7 @@ const renderHeading = (
         aria-label="Anchor link"
         onClick={(e) => {
           e.preventDefault();
-          // Update URL without triggering navigation
-          const newUrl = `#${currentPath}#${id}`;
-          window.history.replaceState(null, '', newUrl);
-          // Scroll to element
+          window.history.replaceState(null, '', `#${currentPath}#${id}`);
           document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }}
       >
@@ -54,34 +45,21 @@ const renderHeading = (
   );
 };
 
-const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = ({ block, index }) => {
+const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
+  block, index, GraphBlock, CompareImage, Splide, SplideSlide
+}) => {
   const codeRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const location = useLocation();
-  
   const currentPath = location.pathname;
 
+  // PrismJS syntax highlighting (static language imports only)
   useEffect(() => {
-    const highlight = async () => {
-      if (!codeRef.current) return;
-      const lang = block.language || 'text';
-      try {
-        if (!Prism.languages[lang]) {
-          await import(/* @vite-ignore */ `prismjs/components/prism-${lang}.js`);
-        }
-      } catch {
-        console.warn(`Language '${lang}' not available in Prism, falling back to plain text.`);
-      }
-
-      codeRef.current.innerHTML = Prism.highlight(
-        block.content,
-        Prism.languages[lang] || Prism.languages.plaintext,
-        lang
-      );
-    };
-
-    highlight();
-  }, [block.language, block.content]);
+    if (block.type !== 'code' || !codeRef.current) return;
+    const lang = block.language || 'text';
+    const grammar = Prism.languages[lang] || Prism.languages.plaintext;
+    codeRef.current.innerHTML = Prism.highlight(block.content, grammar, lang);
+  }, [block]);
 
   switch (block.type) {
     case 'title-h1':
@@ -117,7 +95,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
               {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
-          <pre className={`language-${block.language || 'text'} !m-0 !rounded-none !p-4 !overflow-x-auto !text-sm !w-full`}>
+          <pre className={`language-${block.language || 'text'} !m-0 !rounded-none !p-4 overflow-x-auto text-sm w-full`}>
             <code
               ref={codeRef}
               className={`language-${block.language || 'text'} break-words whitespace-pre`}
@@ -132,16 +110,11 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
       );
 
     case 'math':
-      return (
-        <div key={index} className="mb-6 text-center">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: katex.renderToString(block.content, { throwOnError: false })
-            }}
-            className="text-gray-800 text-lg"
-          />
-        </div>
-      );
+  return (
+    <div key={index} className="mb-6 text-center">
+      <DynamicKatex content={block.content} />
+    </div>
+  );
 
     case 'graph':
       return (
@@ -243,7 +216,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
       return (
         <div key={index} className="mb-6">
           <Splide options={{ type: 'loop', gap: '1rem', arrows: true, pagination: true }}>
-            {block.images?.map((img: { src: string; alt?: string }, idx: number) => (
+            {block.images?.map((img, idx) => (
               <SplideSlide key={idx}>
                 <img src={img.src} alt={img.alt || `Image ${idx + 1}`} className="w-full rounded-lg border" />
               </SplideSlide>
@@ -262,7 +235,7 @@ const ContentBlockRenderer: React.FC<{ block: ContentBlock; index: number; }> = 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full rounded-lg border"
-            ></iframe>
+            />
           </div>
         </div>
       );

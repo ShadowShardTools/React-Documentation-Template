@@ -1,9 +1,9 @@
 {
-  "name": "react-documentation-template",
+  "name": "sst-docs",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://shadowshardtools.github.io/React-Documentation-Template/",
+  "homepage": "https://shadowshardtools.github.io/SST-Docs/",
   "scripts": {
     "generate:prism": "node src/services/GeneratePrismLanguages.js",
     "generate:index": "node src/services/GenerateIndex.js",

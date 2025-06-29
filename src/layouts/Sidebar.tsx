@@ -23,7 +23,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [filter, setFilter] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const focusableRefs = useRef<HTMLElement[]>([]);
+  const flatFocusableListRef = useRef<
+    { ref: HTMLElement | null; entry: { type: string; id?: string; item?: DocItem } }[]
+  >([]);
   const filterInputRef = useRef<HTMLInputElement>(null);
 
   const toggleCategory = (id: string) =>
@@ -54,16 +56,21 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }
 
-  const flatFocusableList: { ref: HTMLElement | null; entry: { type: string; id?: string; item?: DocItem } }[] = [];
+  // Reset and collect focusable items each render
+  flatFocusableListRef.current = [];
 
   useEffect(() => {
-    focusableRefs.current = focusableRefs.current.filter(Boolean);
-  }, [visible, expandedCategories, expandedSubcategories, filter]);
+    const list = flatFocusableListRef.current;
+    if (selectedIndex >= list.length) {
+      setSelectedIndex(Math.max(0, list.length - 1));
+    }
+  }, [filter, expandedCategories, expandedSubcategories]);
 
   useEffect(() => {
     const handleGlobalKey = (e: KeyboardEvent) => {
       const active = document.activeElement;
       const isInput = active?.tagName === "INPUT" || active?.tagName === "TEXTAREA";
+      const list = flatFocusableListRef.current;
 
       if (e.code === "KeyF" && !isInput) {
         e.preventDefault();
@@ -79,24 +86,24 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       if (!visible || isInput) return;
 
-      const maxIndex = flatFocusableList.length - 1;
+      const maxIndex = list.length - 1;
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedIndex((prev) => {
           const next = Math.min(prev + 1, maxIndex);
-          flatFocusableList[next]?.ref?.focus();
+          list[next]?.ref?.focus();
           return next;
         });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((prev) => {
           const next = Math.max(prev - 1, 0);
-          flatFocusableList[next]?.ref?.focus();
+          list[next]?.ref?.focus();
           return next;
         });
       } else if (e.key === "Enter") {
         e.preventDefault();
-        const target = flatFocusableList[selectedIndex]?.entry;
+        const target = list[selectedIndex]?.entry;
         if (!target) return;
         if (target.type === 'doc' && target.item) {
           onSelect(target.item);
@@ -110,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     window.addEventListener("keydown", handleGlobalKey);
     return () => window.removeEventListener("keydown", handleGlobalKey);
-  }, [flatFocusableList, selectedIndex, visible]);
+  }, [selectedIndex, visible, onSelect]);
 
   return (
     <>
@@ -122,9 +129,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Enter here to filter"
+            placeholder="Enter here to filter..."
             className="w-full pl-8 pr-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs font-semibold text-gray-500 border border-gray-300 rounded bg-white pointer-events-none">F</kbd>
         </div>
 
         <nav className="space-y-4">
@@ -138,8 +146,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     tabIndex={0}
                     ref={(el) => {
                       if (el) {
-                        focusableRefs.current.push(el);
-                        flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                        flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                       }
                     }}
                     className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
@@ -165,8 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   tabIndex={0}
                   ref={(el) => {
                     if (el) {
-                      focusableRefs.current.push(el);
-                      flatFocusableList.push({ ref: el, entry: { type: 'category', id: category.id } });
+                      flatFocusableListRef.current.push({ ref: el, entry: { type: 'category', id: category.id } });
                     }
                   }}
                   className="flex items-center justify-between w-full text-left text-gray-800 font-medium hover:text-blue-600 px-2 py-1"
@@ -191,8 +197,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         tabIndex={0}
                         ref={(el) => {
                           if (el) {
-                            focusableRefs.current.push(el);
-                            flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                            flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                           }
                         }}
                         className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
@@ -213,8 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             tabIndex={0}
                             ref={(el) => {
                               if (el) {
-                                focusableRefs.current.push(el);
-                                flatFocusableList.push({ ref: el, entry: { type: 'subcategory', id: sub.id } });
+                                flatFocusableListRef.current.push({ ref: el, entry: { type: 'subcategory', id: sub.id } });
                               }
                             }}
                             className="flex items-center justify-between w-full text-left text-gray-700 hover:text-blue-600 px-2 py-1"
@@ -239,8 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                   tabIndex={0}
                                   ref={(el) => {
                                     if (el) {
-                                      focusableRefs.current.push(el);
-                                      flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                                      flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                                     }
                                   }}
                                   className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)

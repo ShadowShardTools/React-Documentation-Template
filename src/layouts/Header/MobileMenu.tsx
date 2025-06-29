@@ -27,7 +27,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     />
 
     <a
-      href="https://github.com/ShadowShardTools/React-Documentation-Template"
+      href="https://github.com/ShadowShardTools/SST-Docs"
       target="_blank"
       rel="noopener noreferrer"
       className="flex items-center py-2 px-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
