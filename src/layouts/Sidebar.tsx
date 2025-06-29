@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   ChevronRight,
-  ChevronLeft,
   ChevronDown,
   FileText,
   Folder,
@@ -18,10 +17,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedItem,
   initiallyVisible = true,
 }) => {
-  const [visible, setVisible] = useState(initiallyVisible);
+  const [visible] = useState(initiallyVisible);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const focusableRefs = useRef<HTMLElement[]>([]);
+  const filterInputRef = useRef<HTMLInputElement>(null);
 
   const toggleCategory = (id: string) =>
     setExpandedCategories((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -32,7 +35,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   const isSelected = (item: DocItem) => selectedItem?.id === item.id;
   const filterText = filter.toLowerCase();
 
-  // Organize items by category & subcategory
   const categoryMap: Record<string, Record<string, DocItem[]>> = {};
   const standaloneItems: DocItem[] = [];
 
@@ -52,170 +54,216 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
+  const flatFocusableList: { ref: HTMLElement | null; entry: { type: string; id?: string; item?: DocItem } }[] = [];
 
-    const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
-      if (e.matches) {
-        setVisible(true);
+  useEffect(() => {
+    focusableRefs.current = focusableRefs.current.filter(Boolean);
+  }, [visible, expandedCategories, expandedSubcategories, filter]);
+
+  useEffect(() => {
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      const active = document.activeElement;
+      const isInput = active?.tagName === "INPUT" || active?.tagName === "TEXTAREA";
+
+      if (e.code === "KeyF" && !isInput) {
+        e.preventDefault();
+        filterInputRef.current?.focus();
+        return;
+      }
+
+      if (e.key === "Escape" && active === filterInputRef.current) {
+        e.preventDefault();
+        filterInputRef.current?.blur();
+        return;
+      }
+
+      if (!visible || isInput) return;
+
+      const maxIndex = flatFocusableList.length - 1;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          const next = Math.min(prev + 1, maxIndex);
+          flatFocusableList[next]?.ref?.focus();
+          return next;
+        });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          const next = Math.max(prev - 1, 0);
+          flatFocusableList[next]?.ref?.focus();
+          return next;
+        });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const target = flatFocusableList[selectedIndex]?.entry;
+        if (!target) return;
+        if (target.type === 'doc' && target.item) {
+          onSelect(target.item);
+        } else if (target.type === 'category' && target.id) {
+          toggleCategory(target.id);
+        } else if (target.type === 'subcategory' && target.id) {
+          toggleSubcategory(target.id);
+        }
       }
     };
 
-    // Initial check
-    handleResize(mediaQuery);
-
-    mediaQuery.addEventListener("change", handleResize);
-    return () => mediaQuery.removeEventListener("change", handleResize);
-  }, []);
+    window.addEventListener("keydown", handleGlobalKey);
+    return () => window.removeEventListener("keydown", handleGlobalKey);
+  }, [flatFocusableList, selectedIndex, visible]);
 
   return (
     <>
-      {/* Sidebar */}
-      {visible && (
-        <aside className={`
-          ${visible ? "fixed md:sticky" : "hidden md:block"}
-          top-16 bottom-0 md:top-16 md:h-[calc(100vh-4rem)]
-          w-64 shrink-0 border-r border-gray-200 p-4 overflow-y-auto custom-scrollbar bg-white z-40
-        `}>
-          <div className="mb-4 relative">
-            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder="Enter here to filter"
-              className="w-full pl-8 pr-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      <aside className="fixed md:sticky top-16 bottom-0 md:top-16 md:h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-gray-200 p-4 overflow-y-auto custom-scrollbar bg-white z-40">
+        <div className="mb-4 relative">
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+          <input
+            ref={filterInputRef}
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Enter here to filter"
+            className="w-full pl-8 pr-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-          <nav className="space-y-4">
-            {/* Standalone Items */}
-            {standaloneItems.length > 0 && (
-              <div>
-                <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">General</h2>
-                <ul className="space-y-1">
-                  {standaloneItems.map((item) => (
-                    <li
-                      key={item.id}
-                      className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                        ? "bg-blue-100 text-blue-700 font-semibold"
-                        : "text-gray-700 hover:text-blue-600"
-                        }`}
-                      onClick={() => onSelect(item)}
-                    >
-                      <FileText className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Categories */}
-            {Object.values(categories).map((category) => {
-              const subGroups = categoryMap[category.id];
-              if (!subGroups) return null;
-
-              return (
-                <div key={category.id}>
-                  <button
-                    className="flex items-center justify-between w-full text-left text-gray-800 font-medium hover:text-blue-600"
-                    onClick={() => toggleCategory(category.id)}
+        <nav className="space-y-4">
+          {standaloneItems.length > 0 && (
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">General</h2>
+              <ul className="space-y-1">
+                {standaloneItems.map((item) => (
+                  <li
+                    key={item.id}
+                    tabIndex={0}
+                    ref={(el) => {
+                      if (el) {
+                        focusableRefs.current.push(el);
+                        flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                      }
+                    }}
+                    className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
+                      ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                      : "text-gray-700 hover:text-blue-600"}`}
+                    onClick={() => onSelect(item)}
                   >
-                    <div className="flex items-center gap-2">
-                      <Folder className="w-4 h-4" />
-                      <span>{category.title}</span>
-                    </div>
-                    {expandedCategories[category.id] ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
+                    <FileText className="w-4 h-4" />
+                    <span>{item.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-                  {expandedCategories[category.id] && (
-                    <div className="ml-5 mt-2 space-y-2">
-                      {/* Items without subcategory */}
-                      {subGroups["_no_sub"]?.length > 0 && (
-                        <ul className="space-y-1">
-                          {subGroups["_no_sub"].map((item) => (
-                            <li
-                              key={item.id}
-                              className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                                ? "bg-blue-100 text-blue-700 font-semibold"
-                                : "text-gray-600 hover:text-blue-600"
-                                }`}
-                              onClick={() => onSelect(item)}
-                            >
-                              <FileText className="w-4 h-4" />
-                              <span>{item.title}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+          {Object.values(categories).map((category) => {
+            const subGroups = categoryMap[category.id];
+            if (!subGroups) return null;
 
-                      {/* Subcategories */}
-                      {(category.subcategories || []).map((sub) => {
-                        if (!sub || !subGroups[sub.id]) return null;
-
-                        return (
-                          <div key={sub.id}>
-                            <button
-                              className="flex items-center justify-between w-full text-left text-gray-700 hover:text-blue-600"
-                              onClick={() => toggleSubcategory(sub.id)}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Folder className="w-4 h-4" />
-                                <span>{sub.title}</span>
-                              </div>
-                              {expandedSubcategories[sub.id] ? (
-                                <ChevronDown className="w-4 h-4" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4" />
-                              )}
-                            </button>
-
-                            {expandedSubcategories[sub.id] && (
-                              <ul className="ml-4 mt-1 space-y-1">
-                                {subGroups[sub.id].map((item) => (
-                                  <li
-                                    key={item.id}
-                                    className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                                      ? "bg-blue-100 text-blue-700 font-semibold"
-                                      : "text-gray-600 hover:text-blue-600"
-                                      }`}
-                                    onClick={() => onSelect(item)}
-                                  >
-                                    <FileText className="w-4 h-4" />
-                                    <span>{item.title}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+            return (
+              <div key={category.id}>
+                <button
+                  tabIndex={0}
+                  ref={(el) => {
+                    if (el) {
+                      focusableRefs.current.push(el);
+                      flatFocusableList.push({ ref: el, entry: { type: 'category', id: category.id } });
+                    }
+                  }}
+                  className="flex items-center justify-between w-full text-left text-gray-800 font-medium hover:text-blue-600 px-2 py-1"
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <Folder className="w-4 h-4" />
+                    <span>{category.title}</span>
+                  </div>
+                  {expandedCategories[category.id] ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
                   )}
-                </div>
-              );
-            })}
-          </nav>
-        </aside>
-      )}
+                </button>
 
-      {/* Toggle button pinned to right of sidebar */}
-      <button
-        className={`fixed z-10 w-6 bg-slate-300 hover:bg-white border-x border-gray-500 md:hidden
-        ${visible
-            ? "left-64 top-16 h-[calc(100vh-4rem)]"
-            : "left-0 top-1/2 -translate-y-1/2 h-12 rounded-r-md shadow border"
-          }`}
-        onClick={() => setVisible(!visible)}
-        aria-label="Toggle Sidebar"
-      >
-        {visible ? <ChevronLeft className="mx-auto" /> : <ChevronRight className="mx-auto" />}
-      </button>
+                {expandedCategories[category.id] && (
+                  <div className="ml-5 mt-2 space-y-2">
+                    {subGroups["_no_sub"]?.map((item) => (
+                      <li
+                        key={item.id}
+                        tabIndex={0}
+                        ref={(el) => {
+                          if (el) {
+                            focusableRefs.current.push(el);
+                            flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                          }
+                        }}
+                        className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
+                          ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                          : "text-gray-600 hover:text-blue-600"}`}
+                        onClick={() => onSelect(item)}
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>{item.title}</span>
+                      </li>
+                    ))}
+
+                    {(category.subcategories || []).map((sub) => {
+                      if (!sub || !subGroups[sub.id]) return null;
+                      return (
+                        <div key={sub.id}>
+                          <button
+                            tabIndex={0}
+                            ref={(el) => {
+                              if (el) {
+                                focusableRefs.current.push(el);
+                                flatFocusableList.push({ ref: el, entry: { type: 'subcategory', id: sub.id } });
+                              }
+                            }}
+                            className="flex items-center justify-between w-full text-left text-gray-700 hover:text-blue-600 px-2 py-1"
+                            onClick={() => toggleSubcategory(sub.id)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Folder className="w-4 h-4" />
+                              <span>{sub.title}</span>
+                            </div>
+                            {expandedSubcategories[sub.id] ? (
+                              <ChevronDown className="w-4 h-4" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4" />
+                            )}
+                          </button>
+
+                          {expandedSubcategories[sub.id] && (
+                            <ul className="ml-4 mt-1 space-y-1">
+                              {subGroups[sub.id].map((item) => (
+                                <li
+                                  key={item.id}
+                                  tabIndex={0}
+                                  ref={(el) => {
+                                    if (el) {
+                                      focusableRefs.current.push(el);
+                                      flatFocusableList.push({ ref: el, entry: { type: 'doc', item } });
+                                    }
+                                  }}
+                                  className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
+                                    ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                                    : "text-gray-600 hover:text-blue-600"}`}
+                                  onClick={() => onSelect(item)}
+                                >
+                                  <FileText className="w-4 h-4" />
+                                  <span>{item.title}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
     </>
   );
 };
