@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { NavigationProps } from "../types/props/NavigationProps";
 import type { DocItem } from "../types/entities/DocItem";
+import SidebarNavigationHints from "../components/dialog/SidebarNavigationHints";
 
 const Navigation: React.FC<NavigationProps> = ({
     items,
@@ -121,7 +122,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
     return (
         <>
-            <div className="mb-4 relative">
+            <div className="mb-2 relative">
                 <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
                 <input
                     ref={filterInputRef}
@@ -133,6 +134,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 />
                 <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs font-semibold text-gray-500 border border-gray-300 rounded bg-white pointer-events-none">F</kbd>
             </div>
+            <SidebarNavigationHints className="mb-4" />
 
             <nav className="space-y-4">
                 {standaloneItems.length > 0 && (
@@ -148,8 +150,8 @@ const Navigation: React.FC<NavigationProps> = ({
                                             flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                                         }
                                     }}
-                                    className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                                        ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                                    className={`flex items-center gap-2 cursor-pointer px-2 py-1 ${isSelected(item)
+                                        ? "bg-blue-100 text-blue-700 font-semibold border-l-2 border-blue-500"
                                         : "text-gray-700 hover:text-blue-600"}`}
                                     onClick={() => onSelect(item)}
                                 >
@@ -199,8 +201,8 @@ const Navigation: React.FC<NavigationProps> = ({
                                                     flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                                                 }
                                             }}
-                                            className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                                                ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                                            className={`flex items-center gap-2 cursor-pointer px-2 py-1 ${isSelected(item)
+                                                ? "bg-blue-100 text-blue-700 font-semibold border-l-2 border-blue-500"
                                                 : "text-gray-600 hover:text-blue-600"}`}
                                             onClick={() => onSelect(item)}
                                         >
@@ -245,8 +247,8 @@ const Navigation: React.FC<NavigationProps> = ({
                                                                         flatFocusableListRef.current.push({ ref: el, entry: { type: 'doc', item } });
                                                                     }
                                                                 }}
-                                                                className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 ${isSelected(item)
-                                                                    ? "bg-blue-100 text-blue-700 font-semibold border-2 border-blue-500"
+                                                                className={`flex items-center gap-2 cursor-pointer px-2 py-1 ${isSelected(item)
+                                                                    ? "bg-blue-100 text-blue-700 font-semibold border-l-2 border-blue-500"
                                                                     : "text-gray-600 hover:text-blue-600"}`}
                                                                 onClick={() => onSelect(item)}
                                                             >
