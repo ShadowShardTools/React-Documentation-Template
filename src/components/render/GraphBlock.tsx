@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-const GraphBlock: React.FC<{ expressions: string[] }> = ({ expressions }) => {
+const GraphBlock: React.FC<{ index: number, expressions: string[] }> = ({ index, expressions }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const calculatorRef = useRef<Desmos.Calculator | null>(null);
 
@@ -36,12 +36,14 @@ const GraphBlock: React.FC<{ expressions: string[] }> = ({ expressions }) => {
   }, [expressions]);
 
   return (
-    <div
-      ref={containerRef}
-      role="img"
-      aria-label="Interactive graph"
-      className="w-full h-96 rounded border bg-white shadow-sm"
-    />
+    <div key={index} className="mb-6">
+      <div
+        ref={containerRef}
+        role="img"
+        aria-label="Interactive graph"
+        className="w-full h-96 rounded border bg-white shadow-sm"
+      />
+    </div>
   );
 };
 

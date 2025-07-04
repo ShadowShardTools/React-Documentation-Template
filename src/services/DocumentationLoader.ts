@@ -1,7 +1,7 @@
-import type { Version } from '../types/Version';
-import type { Category } from '../types/Category';
-import type { Subcategory } from '../types/Subcategory';
-import type { DocItem } from '../types/DocItem';
+import type { Version } from '../types/entities/Version';
+import type { Category } from '../types/entities/Category';
+import type { Subcategory } from '../types/entities/Subcategory';
+import type { DocItem } from '../types/entities/DocItem';
 
 interface IndexJson {
   categories: string[];

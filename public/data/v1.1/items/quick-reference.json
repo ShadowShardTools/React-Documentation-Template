@@ -13,12 +13,12 @@
         },
         {
             "type": "table",
-            "headers": [
+            "tableHeaders": [
                 "Method",
                 "Parameters",
                 "Description"
             ],
-            "rows": [
+            "tableRows": [
                 [
                     "init()",
                     "config: Object",

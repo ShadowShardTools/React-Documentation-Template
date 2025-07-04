@@ -5,10 +5,10 @@ const Header = lazy(() => import("../layouts/Header/Header"));
 const Sidebar = lazy(() => import("../layouts/Sidebar"));
 const ContentRenderer = lazy(() => import("../layouts/ContentRenderer"));
 const SearchModal = lazy(() => import("../layouts/SearchModal"));
-import ErrorMessage from "../components/ErrorMessage";
 
 import { UseDocumentationData } from "../services/UseDocumentationData";
-import type { DocItem } from "../types/DocItem";
+import type { DocItem } from "../types/entities/DocItem";
+import ErrorMessage from "../components/dialog/ErrorMessage";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ const MainPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<DocItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -59,10 +60,33 @@ const MainPage: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Ensure sidebar is visible on md+ screens
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setSidebarVisible(true);
+      }
+    };
+
+    if (mediaQuery.matches) {
+      setSidebarVisible(true);
+    }
+
+    mediaQuery.addEventListener('change', handleMediaChange);
+    return () => mediaQuery.removeEventListener('change', handleMediaChange);
+  }, []);
+
+  const handleMobileSelect = () => {
+    if (window.innerWidth < 768) setSidebarVisible(false);
+  };
+
   const navigateToItem = (item: DocItem, anchor?: string) => {
     const path = `/${item.id}${anchor ? `#${anchor}` : ""}`;
     navigate(path);
     setSelectedItem(item);
+    handleMobileSelect();
   };
 
   const filteredItems = useMemo(() => {
@@ -77,7 +101,7 @@ const MainPage: React.FC = () => {
           return block.content.toLowerCase().includes(query);
         }
         if (block.type === "list") {
-          return block.items?.some(i => i.toLowerCase().includes(query));
+          return block.listItems?.some(i => i.toLowerCase().includes(query));
         }
         if (block.type === "code") {
           return block.content.toLowerCase().includes(query);
@@ -102,6 +126,7 @@ const MainPage: React.FC = () => {
           onVersionChange={setCurrentVersion}
           loading={loading.versions}
           onSearchOpen={() => setIsSearchOpen(true)}
+          onSidebarToggle={() => setSidebarVisible(v => !v)}
         />
       </Suspense>
 
@@ -113,6 +138,8 @@ const MainPage: React.FC = () => {
             subcategories={subcategories}
             onSelect={navigateToItem}
             selectedItem={selectedItem}
+            visible={isSidebarVisible}
+            onMobileClose={handleMobileSelect}
           />
         </Suspense>
 

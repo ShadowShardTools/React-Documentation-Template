@@ -1,6 +1,6 @@
 import SearchBar from '../../components/SearchBar';
 import VersionSelector from '../../components/VersionSelector';
-import type { Version } from '../../types/Version';
+import type { Version } from '../../types/entities/Version';
 
 interface MobileMenuProps {
   versions: Version[];

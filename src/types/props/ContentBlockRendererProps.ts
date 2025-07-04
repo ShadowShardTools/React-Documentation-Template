@@ -1,10 +1,12 @@
-import type { ContentBlock } from "../ContentBlock";
+import type { ContentBlock } from "../entities/ContentBlock";
 
 export type ContentBlockRendererProps = {
   block: ContentBlock;
   index: number;
-  GraphBlock: React.ComponentType<{ expressions: string[] }>;
-  CompareImage: React.ComponentType<{ leftImage: string; rightImage: string; sliderLineColor: string }>;
-  Splide: React.ComponentType<{ options: any; children: React.ReactNode }>;
-  SplideSlide: React.ComponentType<{ children: React.ReactNode }>;
+  TextBlock: React.ComponentType<{index: number; block: ContentBlock; currentPath: string;}>;
+  MediaBlock: React.ComponentType<{ index: number; block: ContentBlock }>;
+  MathBlock: React.ComponentType<{ index: number, content: string }>;
+  CodeBlock: React.ComponentType<{ index: number, content: string; language?: string; scriptName?: string }>;
+  GraphBlock: React.ComponentType<{ index: number, expressions: string[] }>;
+  UnknownBlock: React.ComponentType<{ index: number; type: string }>;
 };

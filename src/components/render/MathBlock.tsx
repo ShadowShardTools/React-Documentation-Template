@@ -1,7 +1,6 @@
-// src/components/DynamicKatex.tsx
 import { useEffect, useState } from "react";
 
-const DynamicKatex: React.FC<{ content: string }> = ({ content }) => {
+const MathBlock: React.FC<{ index: number, content: string }> = ({ index, content }) => {
   const [html, setHtml] = useState<string>("");
 
   useEffect(() => {
@@ -24,11 +23,13 @@ const DynamicKatex: React.FC<{ content: string }> = ({ content }) => {
   }, [content]);
 
   return (
-    <div
-      className="text-gray-800 text-lg"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div key={index} className="mb-6 text-center">
+      <div
+        className="text-gray-800 text-lg"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
   );
 };
 
-export default DynamicKatex;
+export default MathBlock;

@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 import { memo } from 'react';
-import type { ErrorMessageProps } from '../types/props/ErrorMessageProps';
+import type { ErrorMessageProps } from '../../types/props/ErrorMessageProps';
 
 const ErrorMessage: React.FC<ErrorMessageProps> = memo(({ message, onRetry }) => (
   <div className="flex items-center justify-center p-8" role="alert" aria-live="polite">

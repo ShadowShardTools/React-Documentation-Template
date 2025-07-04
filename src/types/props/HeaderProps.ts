@@ -1,4 +1,4 @@
-import type { Version } from "../Version";
+import type { Version } from "../entities/Version";
 
 export interface HeaderProps {
   versions: Version[];

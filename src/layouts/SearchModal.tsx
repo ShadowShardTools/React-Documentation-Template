@@ -109,7 +109,7 @@ const SearchModal: React.FC<SearchModalProps> = ({
                                                     return block.content.toLowerCase().includes(lower);
                                                 }
                                                 if (block.type === "list") {
-                                                    return block.items?.some((i) => i.toLowerCase().includes(lower));
+                                                    return block.listItems?.some((i) => i.toLowerCase().includes(lower));
                                                 }
                                                 if (block.type === "code") {
                                                     return block.content.toLowerCase().includes(lower);
@@ -119,7 +119,7 @@ const SearchModal: React.FC<SearchModalProps> = ({
 
                                             const snippet =
                                                 match?.type === "list"
-                                                    ? match.items?.find((i) => i.toLowerCase().includes(lower))
+                                                    ? match.listItems?.find((i) => i.toLowerCase().includes(lower))
                                                     : match?.content;
 
                                             return snippet ? (

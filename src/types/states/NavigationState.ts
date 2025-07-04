@@ -1,4 +1,4 @@
-import type { DocItem } from "./DocItem";
+import type { DocItem } from "../entities/DocItem";
 
 export type NavigationState = Record<
   string, // categoryId

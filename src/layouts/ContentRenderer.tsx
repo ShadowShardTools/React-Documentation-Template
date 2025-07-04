@@ -1,11 +1,13 @@
 import { useEffect, lazy, Suspense } from "react";
-import type { ContentBlock } from "../types/ContentBlock";
+import type { ContentBlock } from "../types/entities/ContentBlock";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 
-const GraphBlock = lazy(() => import("../components/GraphBlock"));
-const CompareImage = lazy(() => import("react-compare-image"));
-const Splide = lazy(() => import("@splidejs/react-splide").then(m => ({ default: m.Splide })));
-const SplideSlide = lazy(() => import("@splidejs/react-splide").then(m => ({ default: m.SplideSlide })));
+const TextBlock = lazy(() => import('../components/render/TextBlock'));
+const MediaBlock = lazy(() => import('../components/render/MediaBlock'));
+const CodeBlock = lazy(() => import("../components/render/CodeBlock"));
+const MathBlock = lazy(() => import("../components/render/MathBlock"));
+const GraphBlock = lazy(() => import("../components/render/GraphBlock"));
+const UnknownBlock = lazy(() => import('../components/render/UnknownBlock'));
 
 const ContentRenderer: React.FC<{
   content: ContentBlock[];
@@ -40,10 +42,12 @@ const ContentRenderer: React.FC<{
             key={index}
             block={block}
             index={index}
+            TextBlock={TextBlock}
+            MediaBlock={MediaBlock}
+            CodeBlock={CodeBlock}
+            MathBlock={MathBlock}
             GraphBlock={GraphBlock}
-            CompareImage={CompareImage}
-            Splide={Splide}
-            SplideSlide={SplideSlide}
+            UnknownBlock={UnknownBlock}
           />
         ))}
       </Suspense>
