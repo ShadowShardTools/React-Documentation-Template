@@ -6,9 +6,18 @@ import {
     Folder,
     Search,
 } from "lucide-react";
-import type { NavigationProps } from "../types/props/NavigationProps";
 import type { DocItem } from "../types/entities/DocItem";
 import SidebarNavigationHints from "../components/dialog/SidebarNavigationHints";
+import type { Category } from "../types/entities/Category";
+import type { Subcategory } from "../types/entities/Subcategory";
+
+export interface NavigationProps {
+  items: DocItem[];
+  categories: Record<string, Category>;
+  subcategories: Record<string, Subcategory>;
+  onSelect: (item: DocItem) => void;
+  selectedItem?: DocItem | null;
+}
 
 const Navigation: React.FC<NavigationProps> = ({
     items,
@@ -16,8 +25,6 @@ const Navigation: React.FC<NavigationProps> = ({
     subcategories,
     onSelect,
     selectedItem,
-    visible,
-    onMobileClose,
 }) => {
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
@@ -85,8 +92,6 @@ const Navigation: React.FC<NavigationProps> = ({
                 return;
             }
 
-            if (!visible || isInput) return;
-
             const maxIndex = list.length - 1;
             if (e.key === "ArrowDown") {
                 e.preventDefault();
@@ -118,7 +123,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
         window.addEventListener("keydown", handleGlobalKey);
         return () => window.removeEventListener("keydown", handleGlobalKey);
-    }, [selectedIndex, visible, onSelect, onMobileClose]);
+    }, [selectedIndex, onSelect]);
 
     return (
         <>

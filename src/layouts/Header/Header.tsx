@@ -1,26 +1,51 @@
 import { useState } from 'react';
-import { LayoutIcon, Menu, X } from 'lucide-react';
+import { List, Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import MobileMenu from './MobileMenu';
 import GithubButtonLink from '../../components/GithubLink';
 import VersionSelector from '../../components/VersionSelector';
 import SearchBar from '../../components/SearchBar';
-import type { HeaderProps } from '../../types/props/HeaderProps';
+import type { Version } from '../../types/entities/Version';
 
-const Header: React.FC<HeaderProps & { onSidebarToggle: () => void }> = ({
+interface HeaderProps {
+  versions: Version[];
+  currentVersion: string;
+  onVersionChange: (version: string) => void;
+  loading: boolean;
+  onSearchOpen: () => void;
+  isMobileNavOpen: boolean;
+  onMobileNavToggle: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
   versions,
   currentVersion,
   onVersionChange,
   loading,
   onSearchOpen,
-  onSidebarToggle,
+  isMobileNavOpen,
+  onMobileNavToggle
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b-2 border-gray-200 transition-colors">
       <div className="flex items-center justify-between h-16 px-4">
-        {/* Left side: mobile menu toggle */}
+        {/* Left side: mobile navigation toggle */}
+        <button
+          type="button"
+          onClick={onMobileNavToggle}
+          aria-label="Toggle navigation"
+          className="md:hidden p-2 text-gray-500 hover:text-gray-700"
+        >
+          {isMobileNavOpen ? <X className="w-6 h-6" /> : <List className="w-6 h-6" />}
+        </button>
+
+        {/* Center: logo */}
+        <div className="flex-1 flex justify-center md:justify-start">
+          <Logo />
+        </div>
+
         <div className="md:hidden">
           <button
             type="button"
@@ -32,24 +57,8 @@ const Header: React.FC<HeaderProps & { onSidebarToggle: () => void }> = ({
           </button>
         </div>
 
-        {/* Center: logo */}
-        <div className="flex-1 flex justify-center md:justify-start">
-          <Logo />
-        </div>
-
         {/* Right side: sidebar toggle + desktop tools */}
         <div className="flex items-center space-x-4">
-          {/* Mobile sidebar toggle */}
-          <button
-            type="button"
-            onClick={onSidebarToggle}
-            className="md:hidden p-2 text-gray-500 hover:text-gray-700"
-            aria-label="Toggle sidebar"
-            title="Toggle sidebar"
-          >
-            <LayoutIcon className="w-6 h-6" />
-          </button>
-
           {/* Desktop tools */}
           <div className="hidden md:flex items-center space-x-4">
             <SearchBar onClick={onSearchOpen} />

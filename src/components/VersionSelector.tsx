@@ -1,6 +1,13 @@
 import { memo, useMemo, useState, useRef, useEffect } from 'react';
 import { ChevronDown, Loader } from 'lucide-react';
-import type { VersionSelectorProps } from '../types/props/VersionSelectorProps';
+import type { Version } from '../types/entities/Version';
+
+interface VersionSelectorProps {
+  versions: Version[];
+  currentVersion: string;
+  onVersionChange: (version: string) => void;
+  loading: boolean;
+}
 
 const VersionSelector = memo<VersionSelectorProps>(({ versions, currentVersion, onVersionChange, loading }) => {
   const [isOpen, setIsOpen] = useState(false);

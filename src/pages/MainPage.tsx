@@ -9,10 +9,14 @@ const SearchModal = lazy(() => import("../layouts/SearchModal"));
 import { UseDocumentationData } from "../services/UseDocumentationData";
 import type { DocItem } from "../types/entities/DocItem";
 import ErrorMessage from "../components/dialog/ErrorMessage";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import Navigation from "../layouts/Navigation";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const { docId } = useParams();
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(true);
 
   const {
     versions,
@@ -28,7 +32,6 @@ const MainPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<DocItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -60,33 +63,11 @@ const MainPage: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Ensure sidebar is visible on md+ screens
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 768px)');
-
-    const handleMediaChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        setSidebarVisible(true);
-      }
-    };
-
-    if (mediaQuery.matches) {
-      setSidebarVisible(true);
-    }
-
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => mediaQuery.removeEventListener('change', handleMediaChange);
-  }, []);
-
-  const handleMobileSelect = () => {
-    if (window.innerWidth < 768) setSidebarVisible(false);
-  };
-
   const navigateToItem = (item: DocItem, anchor?: string) => {
     const path = `/${item.id}${anchor ? `#${anchor}` : ""}`;
     navigate(path);
     setSelectedItem(item);
-    handleMobileSelect();
+    setIsMobileNavOpen(false);
   };
 
   const filteredItems = useMemo(() => {
@@ -126,42 +107,67 @@ const MainPage: React.FC = () => {
           onVersionChange={setCurrentVersion}
           loading={loading.versions}
           onSearchOpen={() => setIsSearchOpen(true)}
-          onSidebarToggle={() => setSidebarVisible(v => !v)}
+          isMobileNavOpen={isMobileNavOpen}
+          onMobileNavToggle={() => setIsMobileNavOpen(prev => !prev)}
         />
       </Suspense>
 
       <main className="flex flex-1">
-        <Suspense fallback={<div className="w-64 bg-gray-50 border-r" />}>
-          <Sidebar
-            items={items}
-            categories={categories}
-            subcategories={subcategories}
-            onSelect={navigateToItem}
-            selectedItem={selectedItem}
-            visible={isSidebarVisible}
-            onMobileClose={handleMobileSelect}
-          />
-        </Suspense>
+        {/* Sidebar only on desktop */}
+        {!isMobile && (
+          <Suspense fallback={<div className="w-64 bg-gray-50 border-r" />}>
+            <Sidebar
+              items={items}
+              categories={categories}
+              subcategories={subcategories}
+              onSelect={navigateToItem}
+              selectedItem={selectedItem}
+            />
+          </Suspense>
+        )}
 
         <div className="flex-1 p-2 md:p-6">
-          {loading.content && <p className="text-gray-500">Loading content...</p>}
-          {error.content && <ErrorMessage message={error.content} />}
-
-          {!loading.content && !error.content && selectedItem && (
-            <Suspense fallback={<p className="text-gray-400">Loading content...</p>}>
-              <ContentRenderer
-                title={selectedItem.title}
-                content={selectedItem.content}
-                category={selectedItem.category?.title}
-                subcategory={selectedItem.subcategory?.title}
+          {isMobile ? (
+            isMobileNavOpen ? (
+              <Navigation
+                items={items}
+                categories={categories}
+                subcategories={subcategories}
+                onSelect={navigateToItem}
+                selectedItem={selectedItem}
               />
-            </Suspense>
-          )}
-
-          {!loading.content && !error.content && !selectedItem && (
-            <div className="text-gray-500 text-center mt-16">
-              Select a document from the sidebar
-            </div>
+            ) : (
+              <Suspense fallback={<p className="text-gray-400">Loading content…</p>}>
+                {selectedItem && (
+                  <ContentRenderer
+                    title={selectedItem.title}
+                    content={selectedItem.content}
+                    category={selectedItem.category?.title}
+                    subcategory={selectedItem.subcategory?.title}
+                  />
+                )}
+              </Suspense>
+            )
+          ) : (
+            <>
+              {loading.content && <p className="text-gray-500">Loading content...</p>}
+              {error.content && <ErrorMessage message={error.content} />}
+              {!loading.content && !error.content && selectedItem && (
+                <Suspense fallback={<p className="text-gray-400">Loading content…</p>}>
+                  <ContentRenderer
+                    title={selectedItem.title}
+                    content={selectedItem.content}
+                    category={selectedItem.category?.title}
+                    subcategory={selectedItem.subcategory?.title}
+                  />
+                </Suspense>
+              )}
+              {!loading.content && !error.content && !selectedItem && (
+                <div className="text-gray-500 text-center mt-16">
+                  Select a document from the sidebar
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>

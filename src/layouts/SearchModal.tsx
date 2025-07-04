@@ -1,6 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { X, ArrowUp, ArrowDown, CornerDownLeft } from "lucide-react";
-import type { SearchModalProps } from "../types/props/SearchModalProps";
+import type { DocItem } from "../types/entities/DocItem";
+
+interface SearchModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    searchTerm: string;
+    onSearchChange: (val: string) => void;
+    results: DocItem[];
+    onSelect: (item: DocItem) => void;
+}
 
 const SearchModal: React.FC<SearchModalProps> = ({
     isOpen,

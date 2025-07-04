@@ -1,6 +1,11 @@
 import { Loader } from 'lucide-react';
 import { memo } from 'react';
-import type { LoadingSpinnerProps } from '../../types/props/LoadingSpinnerProps';
+
+interface LoadingSpinnerProps {
+  message?: string;
+  size?: number;
+  colorClass?: string;
+}
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(
   ({ message = 'Loading...', size = 5, colorClass = 'text-blue-500' }) => (
