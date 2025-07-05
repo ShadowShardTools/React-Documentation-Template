@@ -15,6 +15,7 @@ export interface ContentBlock {
     | "youtube"
     | "code"
     | "math"
+    | "chart"
     | "graph";
 
   content: string;
@@ -42,10 +43,25 @@ export interface ContentBlock {
   audioCaption?: string;
   audioMimeType?: string;
 
+  // Youtube
   youtubeVideoId?: string;
 
+  // Code
   scriptName?: string;
   scriptLanguage?: string;
 
+  // Chart
+  chartData?: {
+    title?: string;
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor?: string;
+      borderColor?: string;
+    }[];
+  };
+
+  // Desmos
   graphExpressions?: string[];
 }

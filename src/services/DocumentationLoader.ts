@@ -119,7 +119,7 @@ export class DocumentationLoader {
       if (raw.docs && Array.isArray(raw.docs) && raw.docs.length > 0) {
         const validDocs = raw.docs
           .map((id) => {
-            if (!id || typeof id !== 'string') {
+            if (!id || typeof id !== "string") {
               console.warn(`Invalid doc id in category ${raw.id}:`, id);
               return null;
             }
@@ -128,33 +128,41 @@ export class DocumentationLoader {
               used.add(id);
               return doc;
             } else {
-              console.warn(`Doc id ${id} referenced in category ${raw.id} not found.`);
+              console.warn(
+                `Doc id ${id} referenced in category ${raw.id} not found.`,
+              );
               return null;
             }
           })
           .filter((doc): doc is DocItem => doc !== null);
-        
+
         docs = validDocs.length > 0 ? validDocs : undefined;
       }
 
       // Handle children array with proper null/undefined checks
       let children: Category[] | undefined = undefined;
-      if (raw.children && Array.isArray(raw.children) && raw.children.length > 0) {
+      if (
+        raw.children &&
+        Array.isArray(raw.children) &&
+        raw.children.length > 0
+      ) {
         const validChildren = raw.children
           .map((cid) => {
-            if (!cid || typeof cid !== 'string') {
+            if (!cid || typeof cid !== "string") {
               console.warn(`Invalid child category id in ${raw.id}:`, cid);
               return null;
             }
             const childRaw = rawMap[cid];
             if (!childRaw) {
-              console.warn(`Child category ${cid} referenced in ${raw.id} not found.`);
+              console.warn(
+                `Child category ${cid} referenced in ${raw.id} not found.`,
+              );
               return null;
             }
             return convert(childRaw);
           })
           .filter((child): child is Category => child !== null);
-        
+
         children = validChildren.length > 0 ? validChildren : undefined;
       }
 
@@ -172,7 +180,7 @@ export class DocumentationLoader {
     Object.values(rawMap).forEach((category) => {
       if (category?.children && Array.isArray(category.children)) {
         category.children.forEach((childId) => {
-          if (childId && typeof childId === 'string') {
+          if (childId && typeof childId === "string") {
             childCategoryIds.add(childId);
           }
         });
@@ -182,10 +190,12 @@ export class DocumentationLoader {
     const tree = Object.values(rawMap)
       .filter((category) => {
         // Only include valid categories that are not children of other categories
-        return category && 
-               typeof category.id === 'string' && 
-               category.id.length > 0 && 
-               !childCategoryIds.has(category.id);
+        return (
+          category &&
+          typeof category.id === "string" &&
+          category.id.length > 0 &&
+          !childCategoryIds.has(category.id)
+        );
       })
       .map(convert);
 

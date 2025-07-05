@@ -2,6 +2,7 @@
 import { lazy } from 'react';
 
 export const blockImports = {
+  'chart': lazy(() => import('../components/render/ChartBlock')),
   'code': lazy(() => import('../components/render/CodeBlock')),
   'description': lazy(() => import('../components/render/DescriptionBlock')),
   'graph': lazy(() => import('../components/render/GraphBlock')),

@@ -22,9 +22,9 @@ export function UseDocumentationData() {
   const [tree, setTree] = useState<Category[]>([]);
   const [standaloneDocs, setStandaloneDocs] = useState<DocItem[]>([]);
 
-  const [loading, setLoading] = useState<LoadingState>({ 
-    versions: true, 
-    content: true 
+  const [loading, setLoading] = useState<LoadingState>({
+    versions: true,
+    content: true,
   });
   const [error, setError] = useState<ErrorState>({});
 
@@ -42,30 +42,33 @@ export function UseDocumentationData() {
     (async () => {
       try {
         console.log("Loading versions...");
-        setDebugInfo(prev => ({ ...prev, baseUrl: import.meta.env.BASE_URL }));
-        
+        setDebugInfo((prev) => ({
+          ...prev,
+          baseUrl: import.meta.env.BASE_URL,
+        }));
+
         const versionList = await DocumentationLoader.loadVersions();
         console.log("Versions loaded:", versionList);
-        
+
         if (!isMounted) return;
-        
+
         setVersions(versionList);
         setCurrentVersion(versionList[0]?.version || "");
-        
+
         // Clear any previous version errors
         setError((err) => ({ ...err, versions: undefined }));
-        
       } catch (err) {
         console.error("Failed to load versions:", err);
-        
+
         if (!isMounted) return;
-        
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
-        setError((prev) => ({ 
-          ...prev, 
-          versions: `Failed to load versions: ${errorMessage}` 
+
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        setError((prev) => ({
+          ...prev,
+          versions: `Failed to load versions: ${errorMessage}`,
         }));
-        setDebugInfo(prev => ({ ...prev, lastError: err as Error }));
+        setDebugInfo((prev) => ({ ...prev, lastError: err as Error }));
       } finally {
         if (isMounted) {
           setLoading((prev) => ({ ...prev, versions: false }));
@@ -90,8 +93,11 @@ export function UseDocumentationData() {
     (async () => {
       try {
         console.log(`Loading content for version: ${currentVersion}`);
-        setDebugInfo(prev => ({ ...prev, lastAttemptedVersion: currentVersion }));
-        
+        setDebugInfo((prev) => ({
+          ...prev,
+          lastAttemptedVersion: currentVersion,
+        }));
+
         if (isMounted) {
           setLoading((prev) => ({ ...prev, content: true }));
           // Clear previous content errors
@@ -102,7 +108,7 @@ export function UseDocumentationData() {
         console.log("Content loaded successfully:", {
           itemsCount: data.items.length,
           treeCount: data.tree.length,
-          standaloneDocsCount: data.standaloneDocs.length
+          standaloneDocsCount: data.standaloneDocs.length,
         });
 
         if (!isMounted) return;
@@ -110,19 +116,21 @@ export function UseDocumentationData() {
         setItems(data.items);
         setTree(data.tree);
         setStandaloneDocs(data.standaloneDocs ?? []);
-        
       } catch (err) {
-        console.error(`Failed to load content for version ${currentVersion}:`, err);
-        
+        console.error(
+          `Failed to load content for version ${currentVersion}:`,
+          err,
+        );
+
         if (!isMounted) return;
-        
-        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
         setError((prev) => ({
           ...prev,
-          content: `Failed to load documentation content for version ${currentVersion}: ${errorMessage}`
+          content: `Failed to load documentation content for version ${currentVersion}: ${errorMessage}`,
         }));
-        setDebugInfo(prev => ({ ...prev, lastError: err as Error }));
-        
+        setDebugInfo((prev) => ({ ...prev, lastError: err as Error }));
       } finally {
         if (isMounted) {
           setLoading((prev) => ({ ...prev, content: false }));
@@ -138,11 +146,11 @@ export function UseDocumentationData() {
   // Helper function to retry loading content
   const retryLoadContent = async () => {
     if (!currentVersion) return;
-    
+
     console.log(`Retrying content load for version: ${currentVersion}`);
     setLoading((prev) => ({ ...prev, content: true }));
     setError((err) => ({ ...err, content: undefined }));
-    
+
     try {
       const data = await DocumentationLoader.loadVersionData(currentVersion);
       setItems(data.items);
@@ -152,7 +160,7 @@ export function UseDocumentationData() {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError((prev) => ({
         ...prev,
-        content: `Retry failed: ${errorMessage}`
+        content: `Retry failed: ${errorMessage}`,
       }));
     } finally {
       setLoading((prev) => ({ ...prev, content: false }));
@@ -178,7 +186,7 @@ export function UseDocumentationData() {
         baseUrl: import.meta.env.BASE_URL,
         mode: import.meta.env.MODE,
         dev: import.meta.env.DEV,
-      }
+      },
     };
   };
 

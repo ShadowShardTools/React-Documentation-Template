@@ -25,7 +25,9 @@ const classes = (active: boolean, focused: boolean, lvl: number) =>
   [
     "flex items-center gap-2 cursor-pointer px-2 py-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
     lvl ? "text-gray-600" : "text-gray-700",
-    active ? "bg-blue-100 border-l-2 border-blue-500 text-blue-700 font-semibold" : "",
+    active
+      ? "bg-blue-100 border-l-2 border-blue-500 text-blue-700 font-semibold"
+      : "",
     focused && !active ? "ring-2 ring-blue-300" : "",
     !active && !focused ? "hover:text-blue-600" : "",
   ].join(" ");
@@ -292,7 +294,9 @@ const Navigation: React.FC<NavigationProps> = ({
   // scroll focused row into view
   useEffect(() => {
     if (!currentKey) return;
-    const el = document.querySelector<HTMLElement>(`[data-key="${currentKey}"]`);
+    const el = document.querySelector<HTMLElement>(
+      `[data-key="${currentKey}"]`,
+    );
     el?.scrollIntoView({ block: "nearest" });
   }, [currentKey]);
 
@@ -323,7 +327,7 @@ const Navigation: React.FC<NavigationProps> = ({
           e.preventDefault();
           setCursor((i) => Math.max(0, i - 1));
           break;
-        case "ArrowRight": {
+        case e.ctrlKey && "ArrowRight": {
           const entry = entries[cursor];
           if (entry?.type === "category" && !open[entry.id]) {
             e.preventDefault();
@@ -331,7 +335,7 @@ const Navigation: React.FC<NavigationProps> = ({
           }
           break;
         }
-        case "ArrowLeft": {
+        case e.ctrlKey && "ArrowLeft": {
           const entry = entries[cursor];
           if (entry?.type === "category" && open[entry.id]) {
             e.preventDefault();
@@ -366,8 +370,6 @@ const Navigation: React.FC<NavigationProps> = ({
     return () => window.removeEventListener("keydown", onKey);
   }, [entries, cursor, toggle, open, onSelect, isSearchOpen]);
 
-  
-
   const lower = filter.toLowerCase();
 
   return (
@@ -392,11 +394,17 @@ const Navigation: React.FC<NavigationProps> = ({
       <SidebarNavigationHints className="mb-4" />
 
       {/* Navigation tree */}
-      <nav role="tree" aria-label="Documentation navigation" className="space-y-4">
+      <nav
+        role="tree"
+        aria-label="Documentation navigation"
+        className="space-y-4"
+      >
         {/* Stand‑alone docs */}
         {standaloneDocs.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">General</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">
+              General
+            </h2>
             <ul className="space-y-1">
               {standaloneDocs
                 .filter((d) => d.title.toLowerCase().includes(lower))
