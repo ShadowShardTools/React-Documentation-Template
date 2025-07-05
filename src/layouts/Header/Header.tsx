@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { List, Menu, X } from 'lucide-react';
-import Logo from './Logo';
-import MobileMenu from './MobileMenu';
-import GithubButtonLink from '../../components/GithubLink';
-import VersionSelector from '../../components/VersionSelector';
-import SearchBar from '../../components/SearchBar';
-import type { Version } from '../../types/entities/Version';
+import { useState } from "react";
+import { List, Menu, X } from "lucide-react";
+import Logo from "./Logo";
+import MobileMenu from "./MobileMenu";
+import GithubButtonLink from "../../components/GithubLink";
+import VersionSelector from "../../components/VersionSelector";
+import SearchBar from "../../components/SearchBar";
+import type { Version } from "../../types/entities/Version";
 
 interface HeaderProps {
   versions: Version[];
@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({
   loading,
   onSearchOpen,
   isMobileNavOpen,
-  onMobileNavToggle
+  onMobileNavToggle,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,7 +38,11 @@ const Header: React.FC<HeaderProps> = ({
           aria-label="Toggle navigation"
           className="md:hidden p-2 text-gray-500 hover:text-gray-700"
         >
-          {isMobileNavOpen ? <X className="w-6 h-6" /> : <List className="w-6 h-6" />}
+          {isMobileNavOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <List className="w-6 h-6" />
+          )}
         </button>
 
         {/* Center: logo */}
@@ -53,7 +57,11 @@ const Header: React.FC<HeaderProps> = ({
             aria-label="Toggle menu"
             className="p-2 text-gray-500 hover:text-gray-700"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 

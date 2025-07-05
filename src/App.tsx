@@ -1,6 +1,6 @@
 // src/App.tsx
-import { Routes, Route, HashRouter } from 'react-router-dom';
-import MainPage from './pages/MainPage';
+import { Routes, Route, HashRouter } from "react-router-dom";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (

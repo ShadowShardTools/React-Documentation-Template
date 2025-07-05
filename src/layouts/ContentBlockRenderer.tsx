@@ -1,97 +1,57 @@
-import { useLocation } from 'react-router-dom';
-import { Suspense } from 'react';
-import type { ContentBlock } from '../types/entities/ContentBlock';
+import React, { Suspense, memo } from "react";
+import {
+  blockImports,
+  type BlockType,
+} from "../generated/blockImports.generated";
+import type { ContentBlock } from "../types/entities/ContentBlock";
 
 interface ContentBlockRendererProps {
-  block: ContentBlock;
-  index: number;
-  TextBlock: React.ComponentType<{index: number; block: ContentBlock; currentPath: string;}>;
-  MediaBlock: React.ComponentType<{ index: number; block: ContentBlock }>;
-  MathBlock: React.ComponentType<{ index: number, content: string }>;
-  CodeBlock: React.ComponentType<{ index: number, content: string; language?: string; scriptName?: string }>;
-  GraphBlock: React.ComponentType<{ index: number, expressions: string[] }>;
-  UnknownBlock: React.ComponentType<{ index: number; type: string }>;
+  /** Array of blocks that make up the document */
+  content: ContentBlock[];
+  /** Part of the URL before the #anchor – helps heading blocks build permalinks */
+  currentPath: string;
 }
 
-const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
-  block,
-  index,
-  TextBlock,
-  MediaBlock,
-  CodeBlock,
-  MathBlock,
-  GraphBlock,
-  UnknownBlock,
-}) => {
-  const { pathname } = useLocation();
+/** Simple skeleton shown while a lazily‑loaded block is still downloading. */
+const LoadingSkeleton: React.FC = () => (
+  <div className="my-4 h-6 w-full animate-pulse rounded bg-gray-200" />
+);
 
-  /* ---- text-type blocks --------------------------------------- */
-  if (
-    [
-      'title-h1',
-      'title-h2',
-      'title-h3',
-      'description',
-      'list',
-      'quote',
-      'table',
-    ].includes(block.type)
-  ) {
+/**
+ * Renders every block in the `content` array by looking up the matching
+ * lazily‑loaded component from `blockImports`. Falls back to the `UnknownBlock`
+ * if the type is not recognised.
+ */
+const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = memo(
+  ({ content, currentPath }) => {
     return (
-      <Suspense fallback={null}>
-        <TextBlock index={index} block={block} currentPath={pathname} />
-      </Suspense>
+      <>
+        {content.map((block, index) => {
+          // Resolve component for the given block type (or use `unknown`).
+          const type = (block.type || "unknown") as BlockType;
+          const LazyBlock = (blockImports[type] ||
+            blockImports["unknown"]) as React.ComponentType<any>;
+
+          return (
+            <Suspense key={index} fallback={<LoadingSkeleton />}>
+              {/*
+                Most block components accept { index, block, currentPath }.
+                UnknownBlock only needs { index, type } but extra props are fine.
+              */}
+              <LazyBlock
+                index={index}
+                block={block}
+                currentPath={currentPath}
+                {...block}
+              />
+            </Suspense>
+          );
+        })}
+      </>
     );
-  }
+  },
+);
 
-  /* ---- media-type blocks -------------------------------------- */
-  if (
-    [
-      'image',
-      'image-compare',
-      'image-compare-slider',
-      'image-carousel',
-      'youtube',
-      'audio',
-    ].includes(block.type)
-  ) {
-    return (
-      <Suspense fallback={null}>
-        <MediaBlock index={index} block={block} />
-      </Suspense>
-    );
-  }
-
-  /* ---- the rest (already components) -------------------------- */
-  switch (block.type) {
-    case 'code':
-      return (
-        <CodeBlock
-          index={index}
-          content={block.content}
-          language={block.language}
-          scriptName={block.scriptName}
-        />
-      );
-
-    case 'math':
-      return <MathBlock index={index} content={block.content} />;
-
-    case 'graph':
-      return (
-        <GraphBlock
-          index={index}
-          expressions={block.graphExpressions || []}
-        />
-      );
-
-    default:
-      return (
-        <Suspense fallback={null}>
-          <UnknownBlock index={index} type={block.type} />
-        </Suspense>
-      );
-  }
-};
+ContentBlockRenderer.displayName = "ContentBlockRenderer";
 
 export default ContentBlockRenderer;

@@ -5,7 +5,8 @@ interface SearchBarProps {
   onClick: () => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = memo(({ onClick }) => (
+// Split the definition so we can attach a displayName
+const SearchBarComponent: React.FC<SearchBarProps> = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
@@ -13,8 +14,8 @@ const SearchBar: React.FC<SearchBarProps> = memo(({ onClick }) => (
     title="Open search (Ctrl + K)"
     className="
       group relative flex items-center
-      w-full
-      px-3 py-2 border border-gray-300 rounded-md
+      w-full px-3 py-2
+      border border-gray-300 rounded-md
       text-left text-sm text-gray-500
       hover:border-gray-400
       focus:outline-none focus:ring-2 focus:ring-blue-500
@@ -30,6 +31,9 @@ const SearchBar: React.FC<SearchBarProps> = memo(({ onClick }) => (
       K
     </kbd>
   </button>
-));
+);
 
+SearchBarComponent.displayName = "SearchBar";
+
+export const SearchBar = memo(SearchBarComponent);
 export default SearchBar;

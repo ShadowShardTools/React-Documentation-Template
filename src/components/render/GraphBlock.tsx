@@ -1,5 +1,5 @@
-import Desmos from 'desmos';
-import { useEffect, useRef } from 'react';
+import Desmos from "desmos";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -7,7 +7,10 @@ declare global {
   }
 }
 
-const GraphBlock: React.FC<{ index: number, expressions: string[] }> = ({ index, expressions }) => {
+const GraphBlock: React.FC<{ index: number; graphExpressions: string[] }> = ({
+  index,
+  graphExpressions,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const calculatorRef = useRef<Desmos.Calculator | null>(null);
 
@@ -16,13 +19,13 @@ const GraphBlock: React.FC<{ index: number, expressions: string[] }> = ({ index,
     if (!container) return;
 
     const calculator = Desmos.GraphingCalculator(container, {
-      expressions: true,
+      graphExpressions: true,
       keypad: true,
     });
 
     calculatorRef.current = calculator;
 
-    expressions.forEach((expr, index) => {
+    graphExpressions.forEach((expr, index) => {
       calculator.setExpression({
         id: `expr-${index}`,
         latex: expr,
@@ -33,7 +36,7 @@ const GraphBlock: React.FC<{ index: number, expressions: string[] }> = ({ index,
       calculatorRef.current?.destroy?.();
       calculatorRef.current = null;
     };
-  }, [expressions]);
+  }, [graphExpressions]);
 
   return (
     <div key={index} className="mb-6">

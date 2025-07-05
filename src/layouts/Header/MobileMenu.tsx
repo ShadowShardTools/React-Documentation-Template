@@ -1,6 +1,6 @@
-import SearchBar from '../../components/SearchBar';
-import VersionSelector from '../../components/VersionSelector';
-import type { Version } from '../../types/entities/Version';
+import SearchBar from "../../components/SearchBar";
+import VersionSelector from "../../components/VersionSelector";
+import type { Version } from "../../types/entities/Version";
 
 interface MobileMenuProps {
   versions: Version[];
@@ -15,7 +15,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   currentVersion,
   onVersionChange,
   loading,
-  onSearchOpen
+  onSearchOpen,
 }) => (
   <div className="absolute top-16 left-0 w-full bg-white border-t border-gray-200 z-40 p-4 md:hidden shadow-md space-y-4">
     <SearchBar onClick={onSearchOpen} />
@@ -32,7 +32,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       rel="noopener noreferrer"
       className="flex items-center py-2 px-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
     >
-      <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg
+        className="h-5 w-5 mr-2"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
         <path
           fillRule="evenodd"
           d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483

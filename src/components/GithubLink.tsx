@@ -24,4 +24,3 @@ const GithubButtonLink: React.FC = () => (
 );
 
 export default GithubButtonLink;
-

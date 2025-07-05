@@ -1,56 +1,48 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect } from "react";
 import type { ContentBlock } from "../types/entities/ContentBlock";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 
-const TextBlock = lazy(() => import('../components/render/TextBlock'));
-const MediaBlock = lazy(() => import('../components/render/MediaBlock'));
-const CodeBlock = lazy(() => import("../components/render/CodeBlock"));
-const MathBlock = lazy(() => import("../components/render/MathBlock"));
-const GraphBlock = lazy(() => import("../components/render/GraphBlock"));
-const UnknownBlock = lazy(() => import('../components/render/UnknownBlock'));
-
-const ContentRenderer: React.FC<{
+interface Props {
   content: ContentBlock[];
   title: string;
   category?: string;
   subcategory?: string;
-}> = ({ content, title, category, subcategory }) => {
+}
+
+const ContentRenderer: React.FC<Props> = ({
+  content,
+  title,
+  category,
+  subcategory,
+}) => {
+  /* scroll to hash on mount / content change */
   useEffect(() => {
-    const hash = decodeURIComponent(location.hash.split('#')[2] || '');
+    const hash = decodeURIComponent(location.hash.split("#")[2] || "");
     if (!hash) return;
 
     const el = document.getElementById(hash);
     if (el) {
       requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   }, [content]);
 
+  /* currentPath = part before #anchor */
+  const currentPath = location.hash.split("#")[1] || location.pathname.slice(1);
+
   return (
     <div className="prose max-w-none">
       <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
+
       {(category || subcategory) && (
         <div className="text-sm text-gray-500 mb-6">
           {category}
           {subcategory && ` > ${subcategory}`}
         </div>
       )}
-      <Suspense fallback={<p className="text-gray-400">Loading block...</p>}>
-        {content.map((block, index) => (
-          <ContentBlockRenderer
-            key={index}
-            block={block}
-            index={index}
-            TextBlock={TextBlock}
-            MediaBlock={MediaBlock}
-            CodeBlock={CodeBlock}
-            MathBlock={MathBlock}
-            GraphBlock={GraphBlock}
-            UnknownBlock={UnknownBlock}
-          />
-        ))}
-      </Suspense>
+
+      <ContentBlockRenderer content={content} currentPath={currentPath} />
     </div>
   );
 };

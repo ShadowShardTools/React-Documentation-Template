@@ -1,8 +1,9 @@
-import type { Subcategory } from "./Subcategory";
+import type { DocItem } from "./DocItem";
 
 export interface Category {
   id: string;
   title: string;
   description?: string;
-  subcategories: Subcategory[];
+  docs?: DocItem[];
+  children?: Category[];
 }

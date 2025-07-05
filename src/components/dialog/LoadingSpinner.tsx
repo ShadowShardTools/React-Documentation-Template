@@ -1,5 +1,5 @@
-import { Loader } from 'lucide-react';
-import { memo } from 'react';
+import { Loader } from "lucide-react";
+import { memo } from "react";
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -8,7 +8,7 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(
-  ({ message = 'Loading...', size = 5, colorClass = 'text-blue-500' }) => (
+  ({ message = "Loading...", size = 5, colorClass = "text-blue-500" }) => (
     <div
       className="flex items-center justify-center p-8"
       role="status"
@@ -22,7 +22,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(
         <span className="text-gray-600">{message}</span>
       </div>
     </div>
-  )
+  ),
 );
 
 export default LoadingSpinner;

@@ -1,5 +1,5 @@
-// Auto-generated. Do not edit.
-// Used PrismJS language components
+// ⚠️  AUTO-GENERATED — DO NOT EDIT
+// PrismJS components used across all content
 
 import 'prismjs/components/prism-bash.js';
 import 'prismjs/components/prism-csharp.js';

@@ -1,28 +1,23 @@
 export interface ContentBlock {
   type:
-    | 'title-h1'
-    | 'title-h2'
-    | 'title-h3'
-    | 'description'
-    | 'list'
-    | 'quote'
-    | 'table'
-    | 'image'
-    | 'image-compare'
-    | 'image-compare-slider'
-    | 'image-carousel'
-    | 'audio'
-    | 'youtube'
-    | 'code'
-    | 'math'
-    | 'graph';
+    | "title-h1"
+    | "title-h2"
+    | "title-h3"
+    | "description"
+    | "list"
+    | "quote"
+    | "table"
+    | "image"
+    | "image-compare"
+    | "image-compare-slider"
+    | "image-carousel"
+    | "audio"
+    | "youtube"
+    | "code"
+    | "math"
+    | "graph";
 
   content: string;
-  
-  scriptName?: string;
-  language?: string;
-
-  graphExpressions?: string[];
 
   listItems?: string[];
 
@@ -35,8 +30,8 @@ export interface ContentBlock {
 
   // Image compare
   imageBeforeSrc?: string;
-  imageAfterSrc?: string;
   imageBeforeAlt?: string;
+  imageAfterSrc?: string;
   imageAfterAlt?: string;
 
   // Carousel
@@ -48,4 +43,9 @@ export interface ContentBlock {
   audioMimeType?: string;
 
   youtubeVideoId?: string;
+
+  scriptName?: string;
+  scriptLanguage?: string;
+
+  graphExpressions?: string[];
 }

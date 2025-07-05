@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Copy } from "lucide-react";
 
-const CodeBlock: React.FC<{ index: number, content: string, language?: string, scriptName?: string }> = ({ index, content, language = "text", scriptName }) => {
+const CodeBlock: React.FC<{
+  index: number;
+  content: string;
+  scriptName?: string;
+  scriptLanguage?: string;
+}> = ({ index, content, scriptName, scriptLanguage = "text" }) => {
   const codeRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -13,9 +18,14 @@ const CodeBlock: React.FC<{ index: number, content: string, language?: string, s
       await import("prismjs/themes/prism-okaidia.css");
       await import("../../generated/prism-languages.generated");
 
-      const grammar = Prism.languages[language] || Prism.languages.plaintext;
+      const grammar =
+        Prism.languages[scriptLanguage] || Prism.languages.plaintext;
       if (isMounted && codeRef.current) {
-        codeRef.current.innerHTML = Prism.highlight(content, grammar, language);
+        codeRef.current.innerHTML = Prism.highlight(
+          content,
+          grammar,
+          scriptLanguage,
+        );
       }
     };
 
@@ -23,7 +33,7 @@ const CodeBlock: React.FC<{ index: number, content: string, language?: string, s
     return () => {
       isMounted = false;
     };
-  }, [language, content]);
+  }, [scriptLanguage, content]);
 
   return (
     <div key={index} className="relative mb-6 overflow-hidden rounded-md">
@@ -41,15 +51,17 @@ const CodeBlock: React.FC<{ index: number, content: string, language?: string, s
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
-      <pre className={`language-${language} !m-0 !rounded-none !p-4 overflow-x-auto text-sm w-full`}>
+      <pre
+        className={`language-${scriptLanguage} !m-0 !rounded-none !p-4 overflow-x-auto text-sm w-full`}
+      >
         <code
           ref={codeRef}
-          className={`language-${language} break-words whitespace-pre`}
+          className={`language-${scriptLanguage} break-words whitespace-pre`}
         />
       </pre>
-      {language && (
+      {scriptLanguage && (
         <div className="text-xs text-gray-400 mt-1 text-right">
-          {language}
+          {scriptLanguage}
         </div>
       )}
     </div>

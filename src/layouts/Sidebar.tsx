@@ -1,21 +1,32 @@
-import type { NavigationProps } from "./Navigation";
+import React from "react";
+import type { Category } from "../types/entities/Category";
+import type { DocItem } from "../types/entities/DocItem";
 import Navigation from "./Navigation";
 
-const Sidebar: React.FC<NavigationProps> = ({
-  items,
-  categories,
-  subcategories,
+export interface SidebarProps {
+  tree: Category[];
+  standaloneDocs?: DocItem[];
+  onSelect: (doc: DocItem) => void;
+  selectedItem?: DocItem | null;
+  isSearchOpen?: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  tree,
+  standaloneDocs = [],
   onSelect,
   selectedItem,
-}) => {
-
-  return (
-    <>
-      <aside className="hidden md:block fixed md:sticky top-16 bottom-0 md:top-16 md:h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-gray-200 p-4 overflow-y-auto custom-scrollbar bg-white z-40">
-        <Navigation items={items} categories={categories} subcategories={subcategories} onSelect={onSelect} selectedItem={selectedItem} />
-      </aside>
-    </>
-  );
-};
+  isSearchOpen = false
+}) => (
+  <aside className="hidden md:block fixed md:sticky top-16 bottom-0 md:top-16 md:h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-gray-200 p-4 overflow-y-auto custom-scrollbar bg-white z-40">
+    <Navigation
+      tree={tree}
+      standaloneDocs={standaloneDocs}
+      onSelect={onSelect}
+      selectedItem={selectedItem}
+      isSearchOpen={isSearchOpen}
+    />
+  </aside>
+);
 
 export default Sidebar;

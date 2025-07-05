@@ -1,5 +1,5 @@
-declare module '@splidejs/react-splide' {
-  import * as React from 'react';
+declare module "@splidejs/react-splide" {
+  import * as React from "react";
 
   export interface SplideProps extends React.PropsWithChildren {
     options?: Record<string, any>;

@@ -1,8 +1,6 @@
 {
     "id": "themes",
     "title": "Using Themes",
-    "category": "api-reference",
-    "subcategory": "customization",
     "content": [
         {
             "type": "title-h2",
